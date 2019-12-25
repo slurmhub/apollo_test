@@ -4,101 +4,93 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 
 import withApollo from "./apollo";
 
-const GREETINGS = gql`
-  query GREETINGS {
-    greetings
+const ITEMS = gql`
+  query ITEMS {
+    items
   }
 `;
 
-const ADD_GREETING = gql`
-  mutation ADD_GREETING($greeting: String!) {
-    addGreeting(greeting: $greeting)
+const PUSH_ITEM = gql`
+  mutation PUSH_ITEM($item: String!) {
+    pushItem(item: $item)
   }
 `;
 
-const CLEAR_GREETINGS = gql`
-  mutation CLEAR_GREETINGS {
-    clearGreetings
+const POP_ITEM = gql`
+  mutation POP_ITEM {
+    popItem
   }
 `;
 
-const ListGreetings = () => {
-  const { data, error, loading } = useQuery(GREETINGS);
+const ListItems = () => {
+  const { data, error, loading } = useQuery(ITEMS);
 
   if (error) return <p>Oh, no! An error... {error.message}</p>;
-  if (loading) return <p>Please wait for the greetings...</p>;
+  if (loading) return <p>Please wait for the items...</p>;
   return (
     <ol style={{ color: "blue" }}>
-      {data.greetings.map((greeting, idx) => (
-        <li key={idx}>{greeting}</li>
+      {data.items.map((item, idx) => (
+        <li key={idx}>{item}</li>
       ))}
     </ol>
   );
 };
 
-const LatestGreeting = () => {
-  const { data, error, loading } = useQuery(GREETINGS);
+const LatestItem = () => {
+  const { data, error, loading } = useQuery(ITEMS);
 
   if (error) return <p> Oh, no! An error... {error.message}</p>;
-  if (loading) return <p>Please wait for the greeting...</p>;
-  return <div style={{ color: "green" }}>{data.greetings.slice(-1)}</div>;
+  if (loading) return <p>Please wait for the item...</p>;
+  return <div style={{ color: "green" }}>{data.items.slice(-1)}</div>;
 };
 
-const AddGreeting = () => {
-  const [greeting, setGreeting] = React.useState("");
-  const [addGreeting, { error, loading }] = useMutation(ADD_GREETING, {
-    refetchQueries: [{ query: GREETINGS }]
+const AddItem = () => {
+  const [item, setItem] = React.useState("");
+  const [addItem, { error, loading }] = useMutation(PUSH_ITEM, {
+    refetchQueries: [{ query: ITEMS }]
   });
 
   if (error) return <p>Oh, no! An error... {error.message}</p>;
-  if (loading) return <p>Adding your greeting...</p>;
+  if (loading) return <p>Adding your item...</p>;
   return (
     <form
       onSubmit={async e => {
         e.preventDefault();
-        const data = await addGreeting({ variables: { greeting } });
+        const data = await addItem({ variables: { item } });
         console.log(data);
-        setGreeting("");
+        setItem("");
       }}
     >
-      <input
-        name="greeting"
-        value={greeting}
-        onChange={e => setGreeting(e.target.value)}
-      />
-      <button type="submit">add greeting</button>
+      <input name="item" value={item} onChange={e => setItem(e.target.value)} />
+      <button type="submit">add item</button>
     </form>
   );
 };
 
-const ClearGreetings = () => {
-  const [clearGreetings, { error, loading }] = useMutation(CLEAR_GREETINGS, {
-    refetchQueries: [{ query: GREETINGS }]
-  });
+const ClearItems = () => {
+  const [clearItems, { error, loading }] = useMutation(POP_ITEM);
 
   if (error) return <p>Oh, no! An error... {error.message}</p>;
-  if (loading) return <p>Clearing greetings...</p>;
+  if (loading) return <p>Clearing items...</p>;
   return (
     <button
       onClick={async e => {
         e.preventDefault();
-        const data = await clearGreetings({
-          refetchQueries: [{ query: GREETINGS }]
-        });
+        const data = await clearItems({ refetchQueries: [{ query: ITEMS }] });
         console.log(data);
       }}
     >
-      Clear greetings
+      Clear items
     </button>
   );
 };
 
 const App = withApollo(
   <div id="app">
-    <AddGreeting />
-    <ClearGreetings />
-    <LatestGreeting />
-    <ListGreetings />
+    <AddItem />
+    <ClearItems />
+    <LatestItem />
+    <ListItems />
   </div>
 );
 
