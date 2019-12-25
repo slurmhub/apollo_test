@@ -9,7 +9,7 @@ import {
 const client = new ApolloClient({
   cache: new InMemoryCache(),
   link: new HttpLink({
-    uri: "https://trjps.sse.codesandbox.io/"
+    uri: "https://8rqn1.sse.codesandbox.io/"
   })
 });
 
